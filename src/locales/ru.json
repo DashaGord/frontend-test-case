@@ -1,0 +1,35 @@
+{
+  "header": {
+    "title": "🛒 Интернет-магазин",
+    "greeting": "Привет, %USER_NAME%!",
+    "loading": "Загрузка..."
+  },
+  "productList": {
+    "loading": "Загрузка товаров...",
+    "error": "Не удалось загрузить товары. Попробуйте позже.",
+    "searchPlaceholder": "Поиск товаров...",
+    "addToCart": "Добавить в корзину",
+    "categories": {
+      "all": "Все категории",
+      "phones": "Телефоны",
+      "laptops": "Ноутбуки",
+      "tablets": "Планшеты"
+    },
+    "sortBy": {
+      "name": "По названию",
+      "price": "По цене"
+    }
+  },
+  "cart": {
+    "toggle": "Корзина (%COUNT%)",
+    "title": "Корзина",
+    "empty": "Корзина пуста",
+    "remove": "Удалить",
+    "total": "Итого: $%TOTAL_PRICE%",
+    "checkout": {
+      "button": "Оформить заказ",
+      "loading": "Оформляем...",
+      "alert": "Заказ оформлен!"
+    }
+  }
+}
