@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   selectCart,
@@ -6,7 +6,8 @@ import {
   selectTotalPrice,
   removeFromCart,
   updateQuantity,
-  clearCart,
+  checkout,
+  selectCheckoutStatus,
 } from '../store/slices/cartSlice';
 import t from '../locales/ru.json';
 import CartItem from './CartItem';
@@ -16,39 +17,36 @@ export const Cart = () => {
   const cart = useSelector(selectCart);
   const cartCount = useSelector(selectCartCount);
   const totalPrice = useSelector(selectTotalPrice);
+  const checkoutStatus = useSelector(selectCheckoutStatus);
 
   const [isOpen, setIsOpen] = useState(false);
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
-  const handleToggleCart = useCallback(() => {
+  const handleToggleCart = () => {
     setIsOpen(prev => !prev);
-  }, []);
+  };
 
-  const handleCloseCart = useCallback(() => {
+  const handleCloseCart = () => {
     setIsOpen(false);
-  }, []);
+  };
 
-  const handleUpdateQuantity = useCallback((id, quantity) => {
-    if (quantity <= 0) {
-      dispatch(removeFromCart(id));
-      return;
-    }
+  const handleUpdateQuantity = (id, quantity) => {
     dispatch(updateQuantity({ id, quantity }));
-  }, [dispatch]);
+  };
 
-  const handleRemoveFromCart = useCallback((id) => {
+  const handleRemoveFromCart = (id) => {
     dispatch(removeFromCart(id));
-  }, [dispatch]);
+  };
 
   const handleCheckout = () => {
-    setIsCheckingOut(true);
-    setTimeout(() => {
-      alert(t.cart.checkout.alert);
-      dispatch(clearCart());
-      setIsCheckingOut(false);
-      setIsOpen(false);
-    }, 1000);
+    dispatch(checkout());
   };
+
+  useEffect(() => {
+    if (checkoutStatus === 'succeeded') {
+      alert(t.cart.checkout.alert);
+      setIsOpen(false);
+    }
+  }, [checkoutStatus]);
 
   return (
     <div className="cart">
@@ -80,8 +78,8 @@ export const Cart = () => {
 
           <div className="cart-footer">
             <div className="total">{t.cart.total.replace('%TOTAL_PRICE%', totalPrice)}</div>
-            <button className="checkout-btn" onClick={handleCheckout} disabled={cart.length === 0 || isCheckingOut}>
-              {isCheckingOut ? t.cart.checkout.loading : t.cart.checkout.button}
+            <button className="checkout-btn" onClick={handleCheckout} disabled={cart.length === 0 || checkoutStatus === 'loading'}>
+              {checkoutStatus === 'loading' ? t.cart.checkout.loading : t.cart.checkout.button}
             </button>
           </div>
         </div>

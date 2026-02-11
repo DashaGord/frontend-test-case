@@ -1,51 +1,40 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { setProducts, selectProducts } from '../store/slices/productSlice';
-import { setLoading, selectLoading, setError, selectError } from '../store/slices/statusSlice';
+import { fetchProducts, selectProducts, selectProductsStatus, selectProductsError } from '../store/slices/productSlice';
 import { addToCart } from '../store/slices/cartSlice';
-import { fetchProducts } from '../api/mockApi';
 import t from '../locales/ru.json';
 
 export const ProductList = () => {
   const dispatch = useDispatch();
   const products = useSelector(selectProducts);
-  const loading = useSelector(selectLoading);
-  const error = useSelector(selectError);
+  const status = useSelector(selectProductsStatus);
+  const error = useSelector(selectProductsError);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('name');
 
   useEffect(() => {
-    dispatch(setLoading(true));
-    dispatch(setError(null)); // Сбрасываем предыдущую ошибку перед новым запросом
-    fetchProducts()
-      .then(mockProducts => {
-        dispatch(setProducts(mockProducts));
-      })
-      .catch(err => {
-        dispatch(setError(t.productList.error));
-      })
-      .finally(() => {
-        dispatch(setLoading(false));
-      });
-  }, [dispatch]);
+    if (status === 'idle') {
+      dispatch(fetchProducts());
+    }
+  }, [status, dispatch]);
 
-  const handleAddToCart = useCallback((product) => {
+  const handleAddToCart = (product) => {
     dispatch(addToCart(product));
-  }, [dispatch]);
+  };
 
-  const handleSearchChange = useCallback((e) => {
+  const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
-  }, []);
+  };
 
-  const handleCategoryChange = useCallback((e) => {
+  const handleCategoryChange = (e) => {
     setSelectedCategory(e.target.value);
-  }, []);
+  };
 
-  const handleSortChange = useCallback((e) => {
+  const handleSortChange = (e) => {
     setSortBy(e.target.value);
-  }, []);
+  };
 
   const filteredAndSortedProducts = useMemo(() => {
     return products
@@ -61,11 +50,11 @@ export const ProductList = () => {
       });
   }, [products, searchTerm, selectedCategory, sortBy]);
 
-  if (loading) {
+  if (status === 'loading') {
     return <div className="loading">{t.productList.loading}</div>;
   }
 
-  if (error) {
+  if (status === 'failed') {
     return <div className="error-message">{error}</div>;
   }
 
